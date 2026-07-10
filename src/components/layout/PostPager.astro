@@ -1,0 +1,61 @@
+---
+import I18nKey from "@i18n/i18nKey";
+import { i18n } from "@i18n/translation";
+import { Icon } from "astro-icon/components";
+import { getPostUrlBySlug, url } from "@/utils/url-utils";
+
+interface Props {
+	nextSlug?: string;
+	nextTitle?: string;
+	prevSlug?: string;
+	prevTitle?: string;
+	className?: string;
+}
+
+const {
+	nextSlug,
+	nextTitle,
+	prevSlug,
+	prevTitle,
+	className = "",
+} = Astro.props;
+---
+
+<div
+	class:list={[
+		"post-pager flex flex-col md:flex-row justify-between gap-4 overflow-hidden w-full",
+		className,
+	]}
+>
+	<a
+		href={nextSlug ? getPostUrlBySlug(nextSlug) : url("/")}
+		class="w-full font-bold overflow-hidden active:scale-95"
+	>
+		<div class="btn-card rounded-2xl w-full h-15 max-w-full px-4 flex items-center justify-start! gap-4">
+			<Icon
+				is:inline
+				name="material-symbols:chevron-left-rounded"
+				class="text-[2rem] text-(--primary)"
+			/>
+			<div class="overflow-hidden transition text-ellipsis whitespace-nowrap max-w-[calc(100%-3rem)] text-black/75 dark:text-white/75">
+				{nextTitle || i18n(I18nKey.home)}
+			</div>
+		</div>
+	</a>
+
+	<a
+		href={prevSlug ? getPostUrlBySlug(prevSlug) : url("/")}
+		class="w-full font-bold overflow-hidden active:scale-95"
+	>
+		<div class="btn-card rounded-2xl w-full h-15 max-w-full px-4 flex items-center justify-end! gap-4">
+			<div class="overflow-hidden transition text-ellipsis whitespace-nowrap max-w-[calc(100%-3rem)] text-black/75 dark:text-white/75">
+				{prevTitle || i18n(I18nKey.home)}
+			</div>
+			<Icon
+				is:inline
+				name="material-symbols:chevron-right-rounded"
+				class="text-[2rem] text-(--primary)"
+			/>
+		</div>
+	</a>
+</div>
