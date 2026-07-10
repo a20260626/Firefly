@@ -83,6 +83,9 @@ if (!lang) {
 	lang = `${siteConfig.lang}`;
 }
 const siteLang = lang.replace("_", "-");
+const rssUrl = Astro.site
+	? new URL(url("rss.xml"), Astro.site).toString()
+	: url("rss.xml");
 
 // 使用固定的banner偏移量，position配置用于图片定位
 ---
@@ -545,7 +548,7 @@ const siteLang = lang.replace("_", "-");
       rel="alternate"
       type="application/rss+xml"
       title={profileConfig.name}
-      href={`${Astro.site}rss.xml`}
+      href={rssUrl}
     />
 
     <!-- Font Setup (Astro Font API) -->
