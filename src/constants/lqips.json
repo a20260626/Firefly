@@ -33,5 +33,15 @@
   "src:content/posts/images/both-list.avif": "e5e7e4e6e8e7e3e3e5",
   "src:content/posts/images/both-grid.avif": "d5d6d3e6e7e3d8d9e3",
   "src:content/posts/images/1.avif": "b5b0b3bcb6bbe0e0df",
-  "src:content/posts/guide/cover.avif": "c8bca9dde6d2babfb5"
+  "src:content/posts/guide/cover.avif": "c8bca9dde6d2babfb5",
+  "src:content/posts/images/vscode-download.png": "ebf1f5e5eaede5eef5",
+  "src:content/posts/images/pnpm-install-check.png": "50504f474747424242",
+  "src:content/posts/images/nodejs-version-check.png": "545453494947454544",
+  "src:content/posts/images/nodejs-download.png": "646b6d707878b7b8bc",
+  "src:content/posts/images/github-desktop-sign-in.png": "f5f6f8626c6f626c6f",
+  "src:content/posts/images/git-download.png": "eceae6f3f4f0f6f5f2",
+  "src:assets/images/profile-avatar.jpg": "a0e4fbb7edfbc2edfc",
+  "src:content/posts/images/github-desktop-clone-firefly.png": "eae9e8c2d2e6d4e6f6",
+  "src:content/posts/images/fork-firefly-repository.png": "f7f8f9f1f4f4f8f8f9",
+  "src:content/posts/images/create-firefly-fork.png": "f6f7f7f6f6f6f7f6f4"
 }
