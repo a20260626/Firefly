@@ -1,483 +1,248 @@
 ---
-title: "搭项目基础：让空文件夹变成能运行的网页项目"
-published: 2026-07-10T11:18:40+08:00
-updated: 2026-07-03T11:18:40+08:00
+title: "认识 Firefly 文件结构并修改配置"
+published: 2026-07-12T18:00:00+08:00
+updated: 2026-07-12T18:00:00+08:00
 pinned: false
-description: "上一篇我们把 PRD 拆成了几个里程碑。"
-tags: ["AI编程", "ai编程助手", "ai IDE/编辑器", "前端基础", "版本控制"]
-category: "实战篇"
+description: "认识 Firefly 的 Astro 项目结构，找到文章、页面、组件和配置文件，并完成一次安全的站点配置修改。"
+tags: [AI编程, Firefly, Astro, 文件结构, 配置]
+category: 博客指南
 draft: false
 ---
 
-> PRD 已经写好，任务也拆清楚了。
-> 现在进入真正实现的第一步：把一个空文件夹，变成一个能启动、能构建、能继续扩展的网页项目。
+完成 [把 Firefly 在本地运行起来](/posts/run-firefly-locally/) 后，下一步不是立刻修改很多文件，而是先建立一张“项目地图”。知道文件负责什么，再做范围明确的配置修改，遇到问题时才能快速定位。
 
----
+## 问题是什么
 
-上一篇我们把 PRD 拆成了几个里程碑。
+本篇只解决一个问题：**如何在不破坏项目的前提下，找到 Firefly 的核心文件并修改一个站点配置。**
 
-现在终于来到第一个真正动手的任务：
+完成标准是：
 
-> **M1：项目基础。**
+- 能说出文章、页面、组件、布局、配置和静态资源分别放在哪里；
+- 能从 `src/config/index.ts` 找到配置的统一出口；
+- 能修改站点标题或副标题，并在本地页面看到变化；
+- 修改后 `pnpm check` 和 `pnpm build` 都能通过。
 
-这一步听起来不刺激。
+本篇暂时不新增功能，不重写布局，也不同时修改多个配置模块。一次只验证一个变化，便于判断结果是否正确。
 
-它没有漂亮页面，没有复杂交互，也没有炫酷动画。
+## 适用环境是什么
 
-但它很重要。
+本文适用于已经完成以下准备的 Windows 开发环境：
 
-因为一个网页项目能不能长期做下去，往往不取决于第一屏有多好看，而取决于一开始的基础有没有搭稳。
+- 已经 Fork 并克隆 Firefly 仓库；
+- 已经在项目根目录成功执行过 `pnpm install`；
+- Node.js 版本不低于 22，pnpm 可正常使用；
+- 使用 VS Code 打开了包含 `package.json` 和 `pnpm-lock.yaml` 的项目根目录；
+- 能够使用 `pnpm dev` 启动本地开发服务器。
 
-就像盖房子，第一天不是刷墙、铺地板、挂灯，而是先把地基、框架和水电位置定下来。
+本文以当前 Firefly 仓库为准。仓库升级后，个别文件名或目录可能变化，遇到差异时先查看根目录的 `README.md`、`src/config/README.md` 和 `package.json`。
 
-做网站也是一样。
+## 具体怎么做
 
----
+### 1. 先确认自己打开的是项目根目录
 
-## M1 要完成什么
-
-这一篇的目标很明确：
-
-> **让一个空文件夹变成一个可以本地运行的网页项目。**
-
-具体来说，我们要完成 5 件事：
-
-| 任务 | 说明 |
-|------|------|
-| 初始化项目 | 用 Vite 创建 React + TypeScript 项目 |
-| 安装依赖 | 让项目具备运行和构建能力 |
-| 建立目录 | 把代码、数据、文章内容分开放 |
-| 跑通首页 | 浏览器里能看到页面 |
-| 跑通构建 | `npm run build` 能成功 |
-
-这就是 M1 的完成标准。
-
-注意，它不要求：
-
-- 做完整文章页
-- 做 Markdown 渲染
-- 做复杂视觉
-- 做部署上线
-- 做搜索、评论、登录
-
-这些都不是 M1。
-
-M1 只做地基。
-
----
-
-## 为什么选择 Vite + React + TypeScript
-
-这个项目选择的基础技术栈是：
-
-| 技术 | 作用 |
-|------|------|
-| Vite | 快速创建和启动前端项目 |
-| React | 把页面拆成组件 |
-| TypeScript | 让数据结构更清楚，提前发现错误 |
-| CSS | 控制页面样式 |
-
-你现在不需要精通它们。
-
-但你需要知道它们各自负责什么。
-
-一句话理解：
-
-> **Vite 负责启动项目，React 负责组织页面，TypeScript 负责检查数据，CSS 负责让页面好看。**
-
-为什么不直接写一个 HTML 文件？
-
-因为这个网站后面会有：
-
-- 多篇 Markdown 文章
-- 阶段索引
-- 工具索引
-- 文章阅读页
-- 目录跳转
-- 首页和文章页状态切换
-
-纯 HTML 很快会变得难维护。
-
-React + TypeScript 的好处是，它更适合把项目拆成可维护的模块。
-
----
-
-## 第一步：创建项目
-
-在一个空文件夹里，我们可以让 AI 给出初始化命令。
-
-你可以这样问：
+在 VS Code 的资源管理器中确认当前目录包含这些文件：
 
 ```text
-我要创建一个 Vite + React + TypeScript 项目。
-请告诉我从空文件夹开始需要运行哪些命令，并解释每一步做什么。
+Firefly/
+├── package.json       # 项目脚本、依赖和包管理器信息
+├── pnpm-lock.yaml     # 锁定依赖版本
+├── astro.config.mjs   # Astro 构建配置
+├── public/            # 原样复制到网站根目录的静态文件
+├── scripts/           # 图标、图片、字体等构建脚本
+└── src/               # 网站源代码和文章内容
 ```
 
-AI 通常会给出类似这样的命令：
-
-![初始化 Vite + React + TypeScript 项目的终端截图](/assets/m1-terminal-init.svg)
+如果看不到 `package.json`，说明当前目录可能是仓库的上一级或某个子目录。先在终端执行：
 
 ```bash
-npm create vite@latest . -- --template react-ts
-npm install
-npm run dev
+pwd
 ```
 
-这三行分别做了什么？
+Windows PowerShell 也可以执行：
 
-| 命令 | 作用 |
-|------|------|
-| `npm create vite@latest . -- --template react-ts` | 在当前文件夹创建 React + TypeScript 项目 |
-| `npm install` | 安装项目运行需要的依赖 |
-| `npm run dev` | 启动本地开发服务器 |
-
-启动成功后，终端里会出现一个本地地址，比如：
-
-```text
-http://127.0.0.1:5173/
+```powershell
+Get-Location
 ```
 
-在浏览器打开它，如果能看到 Vite 默认页面，说明项目已经跑起来了。
+### 2. 先认识 `src` 目录
 
-![本地开发服务器启动后的浏览器页面截图](/assets/m1-vite-home.svg)
-
-这就是从空文件夹到网页项目的第一步。
-
----
-
-## 第二步：认识项目里的文件
-
-Vite 创建项目后，你会看到一些文件。
-
-新手第一次看可能会有点懵。
-
-不用怕，先认识几个最重要的就行。
-
-| 文件 / 文件夹 | 作用 |
-|---------------|------|
-| `package.json` | 项目说明书，记录脚本和依赖 |
-| `index.html` | 浏览器打开的入口 HTML |
-| `src/main.tsx` | React 应用入口 |
-| `src/App.tsx` | 页面主组件 |
-| `src/styles.css` | 页面样式 |
-| `tsconfig.json` | TypeScript 配置 |
-| `vite.config.ts` | Vite 配置 |
-
-你不用背。
-
-只要先记住：
-
-- 写页面主要看 `src/App.tsx`
-- 写样式主要看 `src/styles.css`
-- 看项目命令主要看 `package.json`
-
-后面遇到不认识的文件，直接问 AI：
-
-```text
-这个文件在 Vite React 项目里是做什么的？
-```
-
----
-
-## 第三步：清理默认内容
-
-Vite 默认会生成一些演示内容，比如 logo、计数器、示例样式。
-
-这些对我们没用。
-
-所以 M1 里通常要做一次清理：
-
-1. 删除默认 logo 和计数器
-2. 保留最小可运行结构
-3. 把页面改成本站自己的基础信息
-4. 确认页面还能正常显示
-
-清理后的 `App.tsx` 不需要复杂。
-
-它可以先只显示：
-
-```tsx
-export function App() {
-  return (
-    <main>
-      <h1>AI 编程学习笔记站</h1>
-      <p>从认知到发布，用 AI 编程工具做出真实网页项目。</p>
-    </main>
-  );
-}
-```
-
-这不是最终页面。
-
-但它证明一件事：
-
-> React 应用已经能正常渲染我们自己的内容。
-
-这就是一个非常好的 M1 验收点。
-
----
-
-## 第四步：建立目录结构
-
-当项目能跑起来后，不要急着写大页面。
-
-先建立目录结构。
-
-这个网站后面会有三类核心内容：
-
-1. 页面和组件
-2. 阶段、工具、文章数据
-3. Markdown 文章正文
-
-所以可以先设计成这样：
-
-![项目基础目录结构截图](/assets/m1-project-tree.svg)
+Firefly 的主要开发内容集中在 `src`：
 
 ```text
 src/
-  components/
-    ArticleReader.tsx
-  content/
-    articles/
-      ...
-  data/
-    articles.ts
-    taxonomy.ts
-  App.tsx
-  main.tsx
-  styles.css
+├── assets/       # 需要由 Astro 优化处理的图片等资源
+├── components/   # 可复用的 Astro、Svelte 和其他界面组件
+├── config/       # 站点功能和视觉效果配置
+├── content/      # Markdown 文章和内容集合
+├── layouts/      # 页面整体布局
+├── pages/        # 页面路由，文件名对应网址路径
+├── plugins/      # Markdown、代码块等内容处理插件
+├── styles/       # 全局样式和主题样式
+├── types/        # TypeScript 类型定义
+└── utils/        # 通用工具函数
 ```
 
-这个结构的意思是：
+可以先记住四个最常用的位置：
 
-| 目录 | 放什么 |
-|------|--------|
-| `components` | 可复用组件，比如文章阅读器 |
-| `content/articles` | Markdown 文章文件 |
-| `data` | 阶段、工具、文章注册表 |
-| `App.tsx` | 页面整体布局和路由状态 |
-| `styles.css` | 全站样式 |
+| 目标 | 位置 |
+| --- | --- |
+| 新增文章 | `src/content/posts/` |
+| 修改站点配置 | `src/config/` |
+| 修改页面路由 | `src/pages/` |
+| 修改公共界面 | `src/components/` 或 `src/layouts/` |
 
-一开始不一定每个文件都有完整内容。
+### 3. 认识文章和路由的关系
 
-但目录先定下来，后面就不容易乱。
+文章放在 `src/content/posts/`，例如：
 
----
+```text
+src/content/posts/
+├── install-required-environment.md
+├── fork-firefly-and-clone.md
+├── run-firefly-locally.md
+└── setup-project-foundation.md
+```
 
-## 第五步：先放入基础数据
+Markdown 文件顶部的 frontmatter 决定标题、日期、分类和标签；文章正文负责页面内容。文章详情页的路由由文章文件名生成，例如：
 
-本站最核心的不是某个按钮，而是学习路径。
+```text
+src/content/posts/run-firefly-locally.md
+→ http://127.0.0.1:24321/posts/run-firefly-locally/
+```
 
-所以 M1 或 M2 很早就要把这些数据放进去：
+因此，文章内容通常不需要手动修改 `src/pages`。只有在要增加一种新的页面类型时，才需要进一步研究页面路由文件。
+
+### 4. 认识 `src/config` 配置目录
+
+Firefly 把配置按功能拆成多个文件，并通过 `src/config/index.ts` 统一导出。常用配置如下：
+
+| 文件 | 主要用途 |
+| --- | --- |
+| `siteConfig.ts` | 站点标题、副标题、网址、主题色、分页和文章页开关 |
+| `profileConfig.ts` | 头像、昵称、个人签名和社交链接 |
+| `navBarConfig.ts` | 顶部导航菜单和外部链接 |
+| `sidebarConfig.ts` | 左右侧栏位置及侧栏组件 |
+| `backgroundWallpaper.ts` | 壁纸、横幅、渐变和水波纹动画 |
+| `effectsConfig.ts` | 樱花等动画特效 |
+| `commentConfig.ts` | 评论系统 |
+| `footerConfig.ts` | 页脚内容 |
+
+不确定某个配置在哪里时，先打开 `src/config/README.md`，再搜索配置名称。不要为了修改标题去改布局组件，也不要把多个功能配置混到同一个文件里。
+
+### 5. 修改一个最小配置：站点副标题
+
+打开 `src/config/siteConfig.ts`，找到：
 
 ```ts
-export const stages = [
-  {
-    id: 'awareness',
-    order: 1,
-    name: '认知篇',
-    topic: 'ai编程能做什么',
-  },
-  {
-    id: 'setup',
-    order: 2,
-    name: '起步篇',
-    topic: '环境从0到1',
-  },
-];
+export const siteConfig: SiteConfig = {
+
+	title: "Steve",
+
+	subtitle: "Demo site",
 ```
 
-这一步的意义很大。
+上面的代码展示了配置所在位置。将 `subtitle` 修改为自己的站点副标题，例如：
 
-它让页面不再是一堆写死的文字，而是由数据驱动。
+```ts
+	subtitle: "AI 编程学习记录",
+```
 
-后面我们要显示 6 个阶段、5 类工具、每个阶段有几篇文章，都可以从数据里算出来。
+保持项目原有的 Tab 缩进和双引号格式即可。
 
-这就是为什么项目基础里要先考虑数据结构。
+如果还要修改站点名称，只修改同一个对象中的 `title`：
 
----
+```ts
+	title: "我的 Firefly 学习站",
+```
 
-## 第六步：让首页先显示学习档案
+一次先改一个字段。保存文件后，观察本地开发服务器和浏览器是否自动刷新。
 
-M1 的首页不需要完整。
+### 6. 修改视觉效果时，先看对应配置
 
-但它可以先显示一个学习档案模块。
+例如要默认关闭水波纹动画，打开 `src/config/backgroundWallpaper.ts`，确认 `common.waves` 使用：
 
-比如：
+```ts
+waves: {
+	enable: {
+		desktop: false,
+		mobile: false,
+	},
+	switchable: false,
+},
+```
 
-| 指标 | 内容 |
-|------|------|
-| 文章 | 当前文章数量 |
-| 阶段 | 6 |
-| 工具 | 5 |
+这里的 `desktop` 和 `mobile` 控制默认状态，`switchable` 控制用户是否能在控制面板中重新切换。只想默认关闭但保留用户切换能力时，可以保留 `switchable: true`；希望访问每个页面都不出现水波纹动画时，使用 `switchable: false`。
 
-这个模块很小，但它能验证几件事：
+### 7. 用开发服务器检查修改
 
-1. 页面能渲染
-2. 数据能导入
-3. 数量能计算
-4. 样式能生效
-
-这就是很好的基础验收。
-
-比起一上来写完整首页，先做这个小模块更稳。
-
----
-
-## 第七步：跑通两个命令
-
-M1 最后一定要验证两个命令。
-
-### 开发服务器
+如果开发服务器没有运行，在项目根目录执行：
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
-它用于本地开发。
+打开终端显示的 `Local` 地址。不要假设端口一定是 `24321`，因为端口可能已经被其他进程占用。刷新首页，确认浏览器标题或页面中使用站点副标题的位置已经更新。
 
-成功后，你可以在浏览器看到页面。
+### 8. 修改前后都查看 Git 差异
 
-### 构建命令
+在终端执行：
 
 ```bash
-npm run build
+git diff -- src/config/siteConfig.ts
+git status --short
 ```
 
-![npm run build 通过的终端截图](/assets/m1-build-success.svg)
+确认差异只有自己计划修改的配置字段。若出现大量无关文件变化，先暂停，不要直接提交。
 
-它用于检查项目能不能被正式打包。
+## 如何验证完成
 
-如果 `npm run dev` 能跑，但 `npm run build` 报错，说明项目还不够稳。
+按顺序完成下面的检查：
 
-所以 M1 的标准必须包括：
+- [ ] 当前目录能看到 `package.json` 和 `pnpm-lock.yaml`；
+- [ ] 能指出文章目录 `src/content/posts/`；
+- [ ] 能指出配置目录 `src/config/`；
+- [ ] 能指出页面目录 `src/pages/`；
+- [ ] 能在 `src/config/index.ts` 找到配置导出；
+- [ ] 已修改 `siteConfig.ts` 中的一个字段；
+- [ ] 已在本地浏览器打开终端显示的 `Local` 地址；
+- [ ] 浏览器中能看到配置修改后的效果；
+- [ ] `git diff` 中没有无关修改；
+- [ ] `pnpm check` 执行成功；
+- [ ] `pnpm build` 执行成功；
+- [ ] 关闭开发服务器后，修改没有被误认为已经提交。
 
-> **开发能跑，构建也能过。**
+验证命令：
 
-这一步非常重要。
-
-因为后面每加一个功能，都可以用 `npm run build` 做一次安全检查。
-
----
-
-## 如何让 AI 帮你做 M1
-
-你可以把任务这样交给 AI：
-
-```text
-请完成 M1：项目基础。
-
-目标：
-从空文件夹创建一个 Vite + React + TypeScript 项目，并搭好后续内容站需要的基础结构。
-
-要求：
-1. 初始化项目
-2. 清理默认示例内容
-3. 建立 src/data、src/content/articles、src/components 目录
-4. 创建 6 个学习阶段和 5 类工具的基础数据
-5. 首页先显示站点标题和学习档案
-6. 不做文章阅读页，不做 Markdown 渲染，不做复杂视觉
-7. 完成后运行 npm run build 验证
+```bash
+pnpm check
+pnpm build
+git diff --check
 ```
 
-注意第 6 条：
+完成后，项目结构就不再是“看不懂的一堆文件”，而是一张可以按职责查找的地图。下一步可以继续学习如何 [新增一篇 Markdown 文章](/posts/write-first-code-with-ai/)，或者先通过 `git status --short` 检查当前改动。
 
-> 不做文章阅读页，不做 Markdown 渲染，不做复杂视觉。
+## 失败时先检查什么
 
-这就是任务边界。
+### 修改后页面没有变化
 
-没有这条，AI 可能会顺手做很多东西。
+先确认修改的是 `src/config/siteConfig.ts`，并且保存了文件。再检查浏览器是否打开了当前项目的开发服务器地址，而不是 GitHub Pages 或其他本地项目。
 
-看起来赚了，实际上可能会把项目弄复杂。
+### `pnpm check` 报 frontmatter 错误
 
----
+检查 Markdown 文件顶部的 `---` 是否成对存在，日期是否使用合法格式，标签是否是数组。配置文件则检查引号、逗号和花括号是否完整。
 
-## M1 完成后应该看到什么
+### `pnpm build` 报 TypeScript 或配置错误
 
-如果 M1 成功，你应该能看到：
+查看第一条错误的文件路径和行号，不要只看最后一行。回到最近一次修改的位置，逐项恢复或修正。可以把完整错误、修改前后的差异和 Node.js/pnpm 版本一起交给 AI 分析。
 
-1. 项目可以启动
-2. 首页能显示网站标题
-3. 首页能显示学习档案
-4. 数据文件里有 6 个阶段
-5. 数据文件里有 5 类工具
-6. `npm run build` 通过
-7. Git 能看到这次改动
+### 水波纹仍然出现
 
-这就够了。
+检查 `backgroundWallpaper.ts` 中桌面端和移动端是否都为 `false`，再检查 `switchable` 是否仍为 `true`。浏览器还可能保存了控制面板的 `localStorage` 状态，清除站点本地存储后重新打开页面。
 
-你不需要在 M1 就看到最终网站。
+### 不知道该改哪个文件
 
-M1 的价值不是完成全部，而是让后面的每一步都有地基。
+先描述目标，再搜索配置名称。例如“我要修改顶部菜单”对应 `navBarConfig.ts`，“我要修改侧栏组件”对应 `sidebarConfig.ts`，“我要修改文章内容”对应 `src/content/posts/`。不要根据文件名猜测后一次改很多文件。
 
 ---
 
-## 常见问题
-
-### 1. npm create vite 卡住怎么办？
-
-先看终端是不是在等你选择项目名称或模板。
-
-有时候它不是卡住，而是在等输入。
-
-如果真的报错，把完整错误复制给 AI，让它判断是网络问题、权限问题，还是 Node.js 没装好。
-
-### 2. npm install 很慢怎么办？
-
-可能是网络问题。
-
-你可以先等一会儿，也可以问 AI：
-
-```text
-npm install 很慢，Windows 环境下有哪些常见解决办法？
-```
-
-但不要随便复制网上奇怪的命令。
-
-### 3. 页面空白怎么办？
-
-先打开浏览器开发者工具，看 Console 有没有红色错误。
-
-把错误信息复制给 AI。
-
-不要只说"白屏了"。
-
-要说：
-
-```text
-我运行 npm run dev 后页面白屏。
-Console 里有这个错误：
-[粘贴错误]
-我刚才修改了 App.tsx。
-请帮我判断原因。
-```
-
-这样 AI 才能快速定位。
-
----
-
-## 小结
-
-这一篇做的是阶段四真正实现的第一步：搭项目基础。
-
-你需要记住的不是某一行命令，而是这个顺序：
-
-1. 用 Vite 创建 React + TypeScript 项目
-2. 安装依赖并启动本地服务器
-3. 清理默认内容
-4. 建立目录结构
-5. 放入阶段和工具基础数据
-6. 让首页显示最小可用内容
-7. 运行 `npm run build` 验证
-
-这一步做完，一个空文件夹就不再是空文件夹了。
-
-它变成了一个可以继续生长的网页项目。
-
-> **M1 的目标不是惊艳，而是稳定。**
-
-下一篇，我们继续往前走：把 PRD 里的 6 个阶段和 5 类工具真正变成页面上的信息架构。
-
----
-
-*从零开始学AI编程 · 阶段四 · 实战篇*
+*从零开始学 AI 编程 · 阶段五 · Firefly 实战*

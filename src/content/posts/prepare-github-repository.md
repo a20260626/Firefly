@@ -1,495 +1,308 @@
 ---
-title: "把代码放到 GitHub：为部署准备远程仓库"
-published: 2026-07-10T16:25:58+08:00
-updated: 2026-07-03T16:25:58+08:00
+title: "提交并推送到 GitHub"
+published: 2026-07-12T20:00:00+08:00
+updated: 2026-07-12T20:00:00+08:00
 pinned: false
-description: "上一篇我们先讲清楚了“部署到底是在做什么”。"
-tags: ["AI编程", "ai编程助手", "ai IDE/编辑器", "版本控制", "部署发布"]
-category: "发布篇"
+description: "在 Firefly 中检查改动、运行验证、创建本地提交，并把 master 分支推送到自己的 GitHub 仓库。"
+tags: [AI编程, Firefly, Git, GitHub, 版本控制]
+category: 博客指南
 draft: false
 ---
 
-> 发布不是从部署平台开始的。
-> 对一个前端项目来说，更稳的第一步，是先把本地代码整理好，提交到 Git，并推送到 GitHub。
+完成 [新增一篇 Markdown 文章](/posts/write-first-code-with-ai/) 后，文章还只存在于自己的电脑上。要让改动进入自己的 GitHub 仓库，需要经过两个动作：先在本地创建 commit，再把 commit push 到远程仓库。
 
----
+不要把“保存文件”“提交”和“推送”混为一谈。它们分别对应工作区、本地 Git 历史和 GitHub 远程仓库。
 
-上一篇我们先讲清楚了“部署到底是在做什么”。
+## 问题是什么
 
-本地地址 `http://127.0.0.1:5177/` 只能给自己看。
-真正的发布，是让项目通过公网链接被别人访问。
+本篇只解决一个问题：**如何把确认无误的 Firefly 改动，安全地提交到本地 Git，并推送到自己的 GitHub 仓库。**
 
-但在 GitHub Pages、Vercel 或 Netlify 能读取项目之前，我们需要先完成一件事：
+输入是本地已经完成并验证的文章或配置修改，输出是：
 
-> **把代码放到一个远程仓库里。**
+- 一个描述清楚的本地 commit；
+- commit 已经位于当前分支；
+- 当前分支已经推送到正确的 GitHub 远程仓库；
+- GitHub 页面能够看到最新提交。
 
-这篇文章不急着点部署按钮。
-我们先把“远程仓库准备”这一步拆清楚。
+本篇不处理 GitHub Pages 部署，也不处理合并上游仓库。推送成功后，下一步才是让 GitHub Actions 或 GitHub Pages 使用这次代码。
 
----
+先记住三层关系：
 
-## 为什么发布前要先有 GitHub 仓库
+| 位置 | 代表动作 | 作用 |
+| --- | --- | --- |
+| 工作区 | 保存文件 | 电脑上的当前修改 |
+| 暂存区和本地仓库 | `git add`、`git commit` | 准备并记录一次版本 |
+| GitHub 远程仓库 | `git push` | 把本地版本上传到 GitHub |
 
-现在代码在你的电脑里。
-部署平台看不到你的本地文件夹。
+## 适用环境是什么
 
-它需要一个可以访问的代码来源。
-最常见的代码来源就是 GitHub 仓库。
+本文适用于已经完成以下准备的 Windows 环境：
 
-可以把关系理解成这样：
+- 已经 Fork 并克隆了自己的 Firefly 仓库；
+- 已安装 Git 或 GitHub Desktop；
+- 当前终端位于包含 `package.json` 和 `.git` 的项目根目录；
+- 已经完成本次文章或配置修改；
+- 已经知道自己的远程仓库地址和目标分支。
 
-| 位置 | 作用 |
-|------|------|
-| 本地文件夹 | 你写代码、改文章、调样式的地方 |
-| 本地 Git 仓库 | 记录每一次改动的地方 |
-| GitHub 远程仓库 | 让部署平台和其他人读取代码的地方 |
-| 部署平台 | 拉取代码、运行构建、生成线上网站的地方 |
+当前仓库使用的典型信息是：
 
-所以 GitHub 不是部署本身。
+~~~text
+分支：master
+远程：origin
+远程地址：https://github.com/a20260626/Firefly.git
+~~~
 
-它更像发布流程里的“代码中转站”和“版本记录中心”。
+你的用户名、仓库地址和分支名可能不同。命令中的 `origin` 和 `master` 以实际检查结果为准，不要盲目照抄。
 
----
+## 具体怎么做
 
-## 先确认本地项目是一个 Git 仓库
+### 1. 进入项目根目录并查看状态
 
-在项目文件夹里运行：
+在 VS Code 终端或 PowerShell 中执行：
 
-```bash
-git status
-```
-
-如果它能显示当前分支和文件状态，说明这里已经是一个 Git 仓库。
-
-如果看到类似下面的提示：
-
-```text
-fatal: not a git repository
-```
-
-说明还没有初始化 Git。
-
-这时可以运行：
-
-```bash
-git init
-```
-
-不过本站前面已经做过项目基础，所以这里更常见的情况是：
-
-> Git 已经存在，只是有很多文件还没提交。
-
----
-
-## 发布前先让 git status 变得可读
-
-准备推送到 GitHub 之前，最重要的不是马上提交。
-
-而是先看清楚当前工作区。
-
-运行：
-
-```bash
-git status --short
-```
-
-你会看到类似：
-
-```text
- M src/App.tsx
- M src/data/articles.ts
-?? src/content/articles/prepare-github-repository.md
-```
-
-这里的含义是：
-
-| 标记 | 含义 |
-|------|------|
-| `M` | 已跟踪文件被修改 |
-| `??` | 新文件，还没有被 Git 跟踪 |
-
-如果你是和 AI 一起写项目，这一步尤其重要。
-
-因为 AI 可能一次改了多个文件。
-你需要知道：
-
-1. 哪些文件是这次任务真正需要的
-2. 哪些文件是之前遗留的改动
-3. 哪些文件不应该被提交
-4. 有没有生成物、临时文件、截图草稿混在里面
-
-发布前的清醒，很多时候就来自 `git status`。
-
----
-
-## 检查哪些文件应该提交
-
-一个前端项目通常应该提交这些内容：
-
-- `src` 里的源码
-- `public` 里的静态资源
-- `package.json`
-- `package-lock.json`
-- `index.html`
-- `vite.config.ts`
-- `tsconfig` 相关配置
-- `README.md` 或项目文档
-
-通常不应该提交这些内容：
-
-- `node_modules`
-- `dist`
-- `.env` 里的敏感配置
-- 临时截图
-- 系统缓存文件
-- 编辑器自动生成的无关文件
-
-为什么 `dist` 通常不提交？
-
-因为部署平台可以自己运行：
-
-```bash
-npm run build
-```
-
-然后生成新的 `dist`。
-
-源码才是项目的根。
-构建产物只是源码生成出来的结果。
-
----
-
-## 确认 .gitignore 是否够用
-
-在推送到 GitHub 前，要看一下 `.gitignore`。
-
-一个 Vite 项目通常至少需要忽略：
-
-```txt
-node_modules
-dist
-.env
-.env.local
-```
-
-`node_modules` 特别不能提交。
-
-它体积很大，而且别人可以通过：
-
-```bash
-npm install
-```
-
-根据 `package.json` 和 `package-lock.json` 重新安装依赖。
-
-如果你把 `node_modules` 提交到 GitHub，仓库会变得很臃肿，也容易引入跨系统问题。
-
----
-
-## 提交前先跑一次构建
-
-在准备提交之前，建议先运行：
-
-```bash
-npm run build
-```
-
-这一步不是形式主义。
-
-它能帮你确认：
-
-1. TypeScript 没有明显类型错误
-2. Markdown 文章能被正确导入
-3. 资源路径没有在构建阶段出错
-4. 项目至少能生成可部署产物
-
-如果构建失败，不要先提交。
-
-先回到调试篇的方法：
-
-- 看第一条真正的报错
-- 判断是语法问题、导入问题，还是资源路径问题
-- 修好后重新构建
-- 再考虑提交
-
-一个好习惯是：
-
-> 每次准备发布前，都让本地构建先通过。
-
----
-
-## 添加文件到暂存区
-
-确认文件没问题后，就可以把这次要提交的内容加入暂存区。
-
-如果你确定所有改动都属于这次任务，可以运行：
-
-```bash
-git add .
-```
-
-但在学习阶段，我更建议先精确一点：
-
-```bash
-git add src/content/articles/prepare-github-repository.md
-git add src/data/articles.ts
-```
-
-这样做的好处是：
-
-> 你知道自己这次提交到底包含了什么。
-
-等你更熟悉 Git 之后，再根据情况使用 `git add .`。
-
----
-
-## 写一个能看懂的 commit message
-
-提交命令是：
-
-```bash
-git commit -m "docs: add GitHub repository preparation article"
-```
-
-提交信息不需要写成作文。
-但它应该让未来的你看得懂。
-
-可以用这种格式：
-
-```text
-类型: 做了什么
-```
-
-常见类型：
-
-| 类型 | 适合场景 |
-|------|----------|
-| `feat` | 新功能 |
-| `fix` | 修 Bug |
-| `docs` | 文档或文章 |
-| `style` | 样式调整 |
-| `refactor` | 重构 |
-| `chore` | 工程配置或杂项 |
-
-本站新增文章时，可以用：
-
-```bash
-git commit -m "docs: add publishing workflow article"
-```
-
-如果同时改了页面功能，也可以用 `feat`。
-
-关键不是格式多高级，而是：
-
-> 让每一次提交都像一个清楚的小存档。
-
----
-
-## 在 GitHub 创建远程仓库
-
-接下来去 GitHub 创建一个新仓库。
-
-需要注意几个选项：
-
-1. 仓库名尽量简单，比如 `ai-learning-site`
-2. 如果本地已经有 README，不要在 GitHub 上重复初始化 README
-3. 可以先选择 Public，方便后续部署平台读取
-4. 不要勾选自动添加 `.gitignore`，本地已有的话会更清楚
-
-创建完成后，GitHub 会给你一个仓库地址。
-
-通常长这样：
-
-```text
-https://github.com/your-name/ai-learning-site.git
-```
-
-这个地址就是远程仓库地址。
-
----
-
-## 连接本地仓库和 GitHub
-
-回到本地终端，运行：
-
-```bash
-git remote add origin https://github.com/your-name/ai-learning-site.git
-```
-
-这里的 `origin` 是远程仓库的默认名字。
-
-添加后可以检查：
-
-```bash
+~~~bash
+git status --short --branch
 git remote -v
-```
+git branch --show-current
+~~~
 
-你应该能看到类似：
+第一条命令确认当前分支和文件改动，第二条命令确认 `origin` 指向自己的仓库，第三条命令确认分支名称。
 
-```text
-origin  https://github.com/your-name/ai-learning-site.git (fetch)
-origin  https://github.com/your-name/ai-learning-site.git (push)
-```
+### 2. 确认本次应该提交哪些文件
 
-这表示：
+先查看摘要和差异：
 
-> 本地仓库已经知道要把代码推送到哪里。
+~~~bash
+git diff --stat
+git diff --check
+git status --short
+~~~
 
----
+重点检查：
 
-## 推送代码到 GitHub
+- 是否包含本次任务需要的文章、配置或图片；
+- 是否混入了不相关的旧改动；
+- 是否出现 `node_modules`、临时文件、密钥或不应提交的构建产物。
 
-如果当前分支叫 `main`，可以运行：
+如果发现不相关的改动，不要直接执行 `git add .`。先记录文件名，再只暂存本次需要的文件。
 
-```bash
-git push -u origin main
-```
+### 3. 提交前运行项目验证
 
-如果当前分支叫 `master`，可以运行：
+文章或配置修改完成后，先执行：
 
-```bash
+~~~bash
+pnpm check
+pnpm build
+~~~
+
+`pnpm check` 检查 Astro 内容和项目诊断，`pnpm build` 检查静态页面是否可以生成。任一命令失败，都先修复问题，再进入提交步骤。
+
+### 4. 精确加入暂存区
+
+假设这次只修改一篇文章，可以执行：
+
+~~~bash
+git add src/content/posts/write-first-code-with-ai.md
+~~~
+
+如果文章还增加了图片，再把图片单独加入：
+
+~~~bash
+git add src/content/posts/images/my-first-firefly-article.png
+~~~
+
+如果这次明确要提交多个相关文件，可以一次列出：
+
+~~~bash
+git add src/content/posts/write-first-code-with-ai.md src/content/posts/images/my-first-firefly-article.png
+~~~
+
+只有在已经确认工作区所有改动都属于同一个任务时，才考虑：
+
+~~~bash
+git add .
+~~~
+
+### 5. 检查暂存区
+
+加入暂存区后，检查“真正会进入 commit 的内容”：
+
+~~~bash
+git diff --cached --stat
+git diff --cached --check
+git status --short
+~~~
+
+`git diff` 查看尚未暂存的改动，`git diff --cached` 查看已经暂存的改动。提交前必须确认后者只包含这次任务的内容。
+
+### 6. 创建本地 commit
+
+确认暂存区没有问题后，执行：
+
+~~~bash
+git commit -m "docs: add GitHub publishing guide"
+~~~
+
+提交信息要说明“做了什么”。常用前缀包括：
+
+| 前缀 | 适用内容 |
+| --- | --- |
+| `docs:` | 文章和文档 |
+| `feat:` | 新功能 |
+| `fix:` | 修复问题 |
+| `chore:` | 工具或维护工作 |
+
+提交完成后确认本地历史：
+
+~~~bash
+git log -1 --oneline
+git status --short --branch
+~~~
+
+此时 commit 已经在本地，但还没有进入 GitHub。
+
+### 7. 推送到 GitHub
+
+确认当前分支是 `master`、远程是 `origin` 后，执行：
+
+~~~bash
+git push origin master
+~~~
+
+如果这是该分支第一次推送，可以设置上游分支：
+
+~~~bash
 git push -u origin master
-```
+~~~
 
-怎么知道当前分支叫什么？
+以后在同一分支上通常可以直接执行：
 
-运行：
-
-```bash
-git branch --show-current
-```
-
-第一次推送时加 `-u`，是为了建立本地分支和远程分支的关联。
-
-以后再推送，通常只需要：
-
-```bash
+~~~bash
 git push
-```
+~~~
 
----
+终端出现类似 `master -> master` 的结果，通常表示推送成功。
 
-## 推送失败时不要慌
+### 8. 在 GitHub 上确认远程提交
 
-第一次推送很容易遇到问题。
+打开 `git remote -v` 输出的仓库地址，进入当前分支的提交记录，确认最新 commit 信息与本地 `git log -1 --oneline` 一致。
 
-常见情况有三类。
+也可以在终端检查远程分支：
 
-### 1. 没有登录或没有权限
+~~~bash
+git ls-remote --heads origin master
+~~~
 
-可能会看到认证失败。
+最后再次执行：
 
-这通常不是代码问题，而是 GitHub 登录方式的问题。
+~~~bash
+git status --short --branch
+~~~
 
-可以检查：
+如果工作区没有本次遗漏的改动，且远程已经出现最新 commit，提交和推送闭环就完成了。
 
-- GitHub 账号是否正确
-- 是否使用了有效的 token
-- 当前仓库是否属于你的账号
-- HTTPS / SSH 方式是否配置正确
+### 9. 使用 GitHub Desktop 完成同一流程
 
-### 2. 远程仓库不是空的
+如果使用 GitHub Desktop，动作顺序是：
 
-如果你在 GitHub 创建仓库时勾选了 README，本地和远程可能都有不同的初始提交。
+1. 打开正确的 Firefly 本地仓库；
+2. 在 Changes 页面检查文件列表和差异；
+3. 只勾选本次需要提交的文件；
+4. 在 Summary 中填写类似 `docs: add GitHub publishing guide` 的提交信息；
+5. 点击 `Commit to master`；
+6. 点击顶部的 `Push origin`；
+7. 打开 GitHub 仓库确认最新提交。
 
-这时需要先处理远程历史。
+GitHub Desktop 只是把 `git status`、`git add`、`git commit` 和 `git push` 做成了可视化界面，版本控制的顺序没有改变。
 
-学习阶段更简单的做法是：
+## 如何验证完成
 
-> 创建空仓库，不在 GitHub 页面上额外生成 README。
+按下面的清单逐项确认：
 
-### 3. 分支名不一致
+- [ ] 当前终端位于 Firefly 项目根目录；
+- [ ] `git status --short --branch` 显示了正确分支；
+- [ ] `git remote -v` 指向自己的 GitHub 仓库；
+- [ ] 已查看 `git diff --stat` 和 `git diff --check`；
+- [ ] `pnpm check` 执行成功；
+- [ ] `pnpm build` 执行成功；
+- [ ] 暂存区只包含本次任务文件；
+- [ ] `git diff --cached --check` 执行成功；
+- [ ] `git commit` 成功创建本地提交；
+- [ ] `git log -1 --oneline` 显示本次提交；
+- [ ] `git push origin <当前分支>` 执行成功；
+- [ ] GitHub 页面显示最新 commit；
+- [ ] 推送后再次检查 Git 状态没有遗漏的本次改动。
 
-本地可能是 `master`，GitHub 默认提示可能是 `main`。
+推荐的命令顺序：
 
-先运行：
+~~~bash
+git status --short --branch
+git remote -v
+pnpm check
+pnpm build
+git diff --check
+git add <本次需要提交的文件>
+git diff --cached --check
+git commit -m "docs: add GitHub publishing guide"
+git push origin <当前分支>
+git status --short --branch
+~~~
 
-```bash
+完成后，本地修改才真正进入了自己的 GitHub 仓库。部署平台是否已经生成线上页面，属于下一步的 GitHub Pages 部署问题。
+
+## 失败时先检查什么
+
+### `fatal: not a git repository`
+
+当前终端不在 Firefly 项目根目录。执行 `Get-Location`，再进入包含 `.git` 和 `package.json` 的目录：
+
+~~~powershell
+Set-Location "E:\Users\13700HX\Documents\GitHub\Firefly"
+~~~
+
+然后重新执行 `git status`。
+
+### `git push` 提示没有权限或认证失败
+
+先执行 `git remote -v`，确认远程地址是自己的仓库。再确认 GitHub Desktop 已登录正确账号，或终端使用的 GitHub 凭据有该仓库的写入权限。不要把密码、Token 或私钥写进文章或提交内容。
+
+### `src refspec master does not match any`
+
+可能是当前分支不是 `master`，也可能还没有创建任何 commit。先执行：
+
+~~~bash
 git branch --show-current
-```
+git log -1 --oneline
+~~~
 
-确认本地分支名，再决定推送命令。
+根据实际分支名推送；如果还没有 commit，先完成 `git add` 和 `git commit`。
 
----
+### `rejected` 或 `non-fast-forward`
 
-## 让 AI 帮你检查远程仓库准备情况
+远程仓库有本地没有的提交。先不要强制推送，先查看远程变化：
 
-你可以这样问 AI：
+~~~bash
+git fetch origin
+git log --oneline --graph --decorate --all -10
+~~~
 
-```text
-请帮我检查这个项目是否已经准备好推送到 GitHub。
-请依次检查：
-1. git status 是否清晰
-2. .gitignore 是否排除了 node_modules、dist、env 文件
-3. npm run build 是否通过
-4. 哪些文件应该加入本次提交
-5. commit message 应该怎么写
-6. 当前分支名是什么
-7. 是否已经配置 remote origin
-8. 如果要推送到 GitHub，下一条命令应该是什么
+确认远程提交内容后，再决定是否合并或变基。除非明确知道后果，不要使用 `git push --force`。
 
-请先解释检查结果，不要直接执行 push。
-```
+### commit 后发现漏了文件
 
-最后一句很重要。
+如果还没有推送，可以补充文件后执行：
 
-在你还不熟悉发布流程时，先让 AI 给出检查结果。
-确认没问题后，再执行推送。
+~~~bash
+git add <漏掉的文件>
+git commit --amend --no-edit
+~~~
 
----
+如果已经推送，先不要重写公共历史。创建一个新的修复 commit，再正常推送。
 
-## 本站这一步对应什么
+### 推送成功但 GitHub 页面没有更新
 
-回到本站。
-
-现在我们已经有了：
-
-- PRD
-- 项目基础
-- 首页
-- 文章阅读页
-- 多篇学习文章
-- 调试记录
-- 发布前理解
-
-如果要正式部署，下一步就是：
-
-1. 确认所有文章都已登记
-2. 确认首页和文章页能正常打开
-3. 确认构建通过
-4. 提交当前代码
-5. 推送到 GitHub
-6. 让部署平台读取 GitHub 仓库
-
-这也是为什么“远程仓库准备”不是一个额外步骤。
-
-它是从本地项目走向线上项目的桥。
+先确认查看的是正确仓库和正确分支，再用 `git log -1 --oneline` 与 GitHub 的最新 commit 对比。代码到达 GitHub 不等于 GitHub Pages 已经部署完成，后续还要检查 Actions 和 Pages 状态。
 
 ---
 
-## 小结
-
-这篇文章完成的是发布篇的第二步：准备 GitHub 远程仓库。
-
-你需要记住：
-
-1. 部署平台通常从 GitHub 读取代码
-2. 推送前先用 `git status` 看清楚工作区
-3. `.gitignore` 要排除 `node_modules`、`dist` 和敏感配置
-4. 提交前先运行 `npm run build`
-5. commit message 要能说明这次改动
-6. GitHub 新仓库尽量保持空仓库，避免初始历史冲突
-7. `remote origin` 是本地仓库和 GitHub 仓库之间的连接
-8. 第一次推送要注意当前分支名是 `main` 还是 `master`
-
-发布不是“把文件扔上网”。
-
-它更像一条有顺序的流水线：
-
-> 本地代码 → Git 提交 → GitHub 仓库 → 部署平台 → 线上链接
-
-下一篇，我们就可以继续往前走：选择一个部署平台，并把这个静态网站真正发布出去。
-
----
-
-*从零开始学AI编程 · 阶段六 · 发布篇*
+*从零开始学 AI 编程 · 阶段五 · Firefly 实战*
