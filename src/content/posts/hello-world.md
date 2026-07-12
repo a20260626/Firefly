@@ -1,6 +1,6 @@
 ---
 title: "Hello World"
-published: 2026-07-02T15:26:12+08:00
+published: 2026-07-09T15:26:12+08:00
 updated: 2026-07-02T15:26:12+08:00
 pinned: false
 description: "这是一篇用于验证 M1 项目基础链路的 Markdown 文章。"

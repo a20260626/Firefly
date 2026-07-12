@@ -1,6 +1,6 @@
 ---
 title: "如何写一个简单 PRD"
-published: 2026-07-03T10:41:27+08:00
+published: 2026-07-10T10:41:27+08:00
 updated: 2026-07-03T10:41:27+08:00
 pinned: false
 description: "前面三个阶段，我们已经完成了准备工作："

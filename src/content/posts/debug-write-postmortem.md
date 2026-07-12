@@ -1,6 +1,6 @@
 ---
 title: "修好报错之后：把一次 Debug 变成可复用经验"
-published: 2026-07-03T16:18:21+08:00
+published: 2026-07-10T16:18:21+08:00
 updated: 2026-07-03T16:18:21+08:00
 pinned: false
 description: "上一篇我们讲了如何读懂 git status。"

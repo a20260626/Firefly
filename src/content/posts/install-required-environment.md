@@ -1,6 +1,6 @@
 ---
 title: 安装必备环境
-published: 2026-07-09T16:30:00+08:00
+published: 2026-07-07T16:30:00+08:00
 pinned: true
 description: 搭建 Firefly 博客开发环境前，需要先安装 Node.js、pnpm、Git、GitHub Desktop 和 VS Code。本篇文章整理了下载安装到版本验证的完整流程。
 tags: [Firefly, 环境配置, Node.js, pnpm, Git]

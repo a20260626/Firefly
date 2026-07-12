@@ -1,6 +1,6 @@
 ---
 title: Fork Firefly 官方仓库并克隆到本地
-published: 2026-07-10T15:00:00+08:00
+published: 2026-07-08T15:00:00+08:00
 pinned: false
 description: 从 GitHub Fork Firefly 官方仓库开始，使用 GitHub Desktop 将自己的仓库克隆到本地，并完成安装依赖、启动开发服务和后续配置修改的准备工作。
 tags: [Firefly, GitHub, Fork, GitHub Desktop, 博客搭建]

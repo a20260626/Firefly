@@ -1,6 +1,6 @@
 ---
 title: "用 AI 写第一行代码"
-published: 2026-07-03T09:48:27+08:00
+published: 2026-07-10T09:48:27+08:00
 updated: 2026-07-03T09:48:27+08:00
 pinned: false
 description: "前两个阶段帮你做完了两件事："

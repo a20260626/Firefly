@@ -1,6 +1,6 @@
 ---
 title: "做项目闭环检查：确认从 PRD 到页面都连起来"
-published: 2026-07-03T15:59:42+08:00
+published: 2026-07-10T15:59:42+08:00
 updated: 2026-07-03T15:59:42+08:00
 pinned: false
 description: "上一篇我们做了视觉统一。"

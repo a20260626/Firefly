@@ -1,6 +1,6 @@
 ---
 title: AI 提示词写作学习笔记
-published: 2026-07-10
+published: 2026-07-08
 pinned: false
 description: 用“看医生”的思路理解 AI 提示词写作：找对角色、讲清背景、提出任务、规定格式、设定语气，并提供参考示例。
 tags: [AI, 提示词, 学习笔记]

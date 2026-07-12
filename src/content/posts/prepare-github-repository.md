@@ -1,6 +1,6 @@
 ---
 title: "把代码放到 GitHub：为部署准备远程仓库"
-published: 2026-07-03T16:25:58+08:00
+published: 2026-07-10T16:25:58+08:00
 updated: 2026-07-03T16:25:58+08:00
 pinned: false
 description: "上一篇我们先讲清楚了“部署到底是在做什么”。"

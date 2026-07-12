@@ -1,6 +1,6 @@
 ---
 title: "改了很多文件后别乱提交：读懂 git status"
-published: 2026-07-03T16:15:18+08:00
+published: 2026-07-10T16:15:18+08:00
 updated: 2026-07-03T16:15:18+08:00
 pinned: false
 description: "上一篇我们讲了样式类调试。"
