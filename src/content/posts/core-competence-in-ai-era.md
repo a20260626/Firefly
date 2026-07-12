@@ -1,6 +1,7 @@
 ---
 title: "AI时代的核心竞争力：驾驭复杂系统的能力"
 published: 2026-07-09T17:28:58+08:00
+hidden: true
 updated: 2026-07-02T17:28:58+08:00
 pinned: false
 description: "走到这里，你已经读完了这个认知篇的前两篇文章："

@@ -1,6 +1,7 @@
 ---
 title: "发布前先想清楚：部署到底是在做什么"
 published: 2026-07-10T16:21:42+08:00
+hidden: true
 updated: 2026-07-03T16:21:42+08:00
 pinned: false
 description: "上一篇我们结束了调试篇。"

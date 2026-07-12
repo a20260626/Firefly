@@ -1,6 +1,7 @@
 ---
 title: "把 PRD 变成信息架构：6 个阶段和 5 类工具如何落到页面上"
 published: 2026-07-10T11:45:01+08:00
+hidden: true
 updated: 2026-07-03T11:45:01+08:00
 pinned: false
 description: "上一篇我们完成了项目基础。"

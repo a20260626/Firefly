@@ -1,6 +1,7 @@
 ---
 title: "做首页体验：让文章、阶段和工具索引在一个页面里站稳"
 published: 2026-07-10T14:32:42+08:00
+hidden: true
 updated: 2026-07-03T14:32:42+08:00
 pinned: false
 description: "上一篇我们把 PRD 里的 6 个阶段和 5 类工具变成了数据结构。"

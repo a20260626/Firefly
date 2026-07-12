@@ -1,6 +1,7 @@
 ---
 title: "页面白屏但构建通过：用 Console 找到运行时错误"
 published: 2026-07-10T16:09:05+08:00
+hidden: true
 updated: 2026-07-03T16:09:05+08:00
 pinned: false
 description: "上一篇我们练习了新增文章后构建失败。"

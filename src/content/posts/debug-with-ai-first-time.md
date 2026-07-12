@@ -1,6 +1,7 @@
 ---
 title: "遇到报错别慌：用 AI 做第一次 Debug"
 published: 2026-07-10T16:03:44+08:00
+hidden: true
 updated: 2026-07-03T16:03:44+08:00
 pinned: false
 description: "上一篇我们完成了阶段四的项目闭环检查。"

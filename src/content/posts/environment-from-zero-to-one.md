@@ -1,6 +1,7 @@
 ---
 title: "环境从 0 到 1"
 published: 2026-07-09T18:12:01+08:00
+hidden: true
 updated: 2026-07-02T18:12:01+08:00
 pinned: false
 description: "前面三篇文章聊了很多\"为什么\"和\"是什么\"。"

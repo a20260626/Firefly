@@ -1,6 +1,7 @@
 ---
 title: "把 PRD 拆成可执行任务"
 published: 2026-07-10T10:59:07+08:00
+hidden: true
 updated: 2026-07-03T10:59:07+08:00
 pinned: false
 description: "上一篇我们复盘了本站的 PRD 是怎么写出来的。"

@@ -1,6 +1,7 @@
 ---
 title: "本站的 PRD 是如何写出来的"
 published: 2026-07-10T10:50:12+08:00
+hidden: true
 updated: 2026-07-03T10:50:12+08:00
 pinned: false
 description: "如果说上一篇是在讲\"PRD 应该怎么写\"，那么这一篇就是现场复盘："

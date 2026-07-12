@@ -1,6 +1,7 @@
 ---
 title: "做文章阅读页：让 Markdown 变成稳定的正文体验"
 published: 2026-07-10T15:51:42+08:00
+hidden: true
 updated: 2026-07-03T15:51:42+08:00
 pinned: false
 description: "上一篇我们做了首页体验。"

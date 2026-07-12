@@ -1,6 +1,7 @@
 ---
 title: "新增文章后构建失败：从路径、slug 到 frontmatter 一步步排查"
 published: 2026-07-10T16:06:21+08:00
+hidden: true
 updated: 2026-07-03T16:06:21+08:00
 pinned: false
 description: "上一篇我们讲了第一次 Debug 的基本方法："

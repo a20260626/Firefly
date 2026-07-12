@@ -1,6 +1,7 @@
 ---
 title: "做视觉统一：把页面调成一套技术博客语言"
 published: 2026-07-10T15:57:13+08:00
+hidden: true
 updated: 2026-07-03T15:57:13+08:00
 pinned: false
 description: "上一篇我们做了站内导航。"

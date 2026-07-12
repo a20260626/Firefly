@@ -1,6 +1,7 @@
 ---
 title: "页面没报错但布局坏了：排查宽度、表格和代码块溢出"
 published: 2026-07-10T16:11:55+08:00
+hidden: true
 updated: 2026-07-03T16:11:55+08:00
 pinned: false
 description: "上一篇我们练习了页面白屏但构建通过时，如何用浏览器 Console 找运行时错误。"
